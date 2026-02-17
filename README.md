@@ -20,13 +20,13 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 
 ## Files at a Glance
 
-| File | Entries | Size | Description |
-|------|---------|------|-------------|
-| `nocap.txt` | 14.3M | 134 MB | Drop-in `rockyou.txt` replacement |
-| `nocap-plus.txt` | 14.4M | 148 MB | Extended with multilingual cohorts |
-| `rizzyou.txt` | 203 | 10 KB | New roots only (the wordforge supplement) |
-| `nocap.rule` | 48.5K | 476 KB | Drop-in `OneRuleToRuleThemStill` replacement |
-| `UNOBTAINIUM.rule` | 194 | 8.7 KB | Surgical high-value rules |
+| File | Entries | Size | Compressed | Description |
+|------|---------|------|------------|-------------|
+| `nocap.txt` | 14.3M | 134 MB | 51 MB (.gz) | Drop-in `rockyou.txt` replacement |
+| `nocap-plus.txt` | 14.4M | 148 MB | 86 MB (.gz) | Extended with multilingual cohorts |
+| `rizzyou.txt` | 203 | 10 KB | — | New roots only (the wordforge supplement) |
+| `nocap.rule` | 48.5K | 476 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
+| `UNOBTAINIUM.rule` | 205 | 3.2 KB | — | Surgical high-value rules |
 
 All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
 
