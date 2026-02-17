@@ -8,6 +8,28 @@ Modern password wordlists and rules to supplement `rockyou.txt`.
 
 **wordforge** provides research-driven supplements that capture what `rockyou.txt` misses.
 
+## Quick Start
+
+```bash
+# Clone the repo
+git clone https://github.com/doritoes/wordforge.git
+
+# Replace rockyou.txt in your workflow
+hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
+```
+
+## Files at a Glance
+
+| File | Entries | Size | Description |
+|------|---------|------|-------------|
+| `nocap.txt` | 14.3M | 134 MB | Drop-in `rockyou.txt` replacement |
+| `nocap-plus.txt` | 14.4M | 148 MB | Extended with multilingual cohorts |
+| `rizzyou.txt` | 70K+ | — | New roots only (the wordforge supplement) |
+| `nocap.rule` | 48.5K | 476 KB | Drop-in `OneRuleToRuleThemStill` replacement |
+| `UNOBTAINIUM.rule` | 194 | 8.7 KB | Surgical high-value rules |
+
+All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
+
 ## Wordlists
 
 ### rizzyou.txt
@@ -75,7 +97,7 @@ hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 
 ### UNOBTAINIUM.rule
 
-Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (~48K rules), UNOBTAINIUM.rule is minimal (~194 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (194 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
 Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes, capitalize+suffix combos, leet substitutions, and special character patterns.
 
@@ -108,6 +130,20 @@ The 30% rate is remarkably stable batch-to-batch, confirming that HIBP batches a
 `rockyou.txt` alone (straight dictionary, no rules) matches ~0.7% of HIBP hashes. With `OneRuleToRuleThemStill.rule`, the rate climbs substantially — but `nocap.txt + nocap.rule` captures everything `rockyou.txt + OneRule` does, plus the modern additions from rizzyou.txt and updated rules.
 
 *Direct A/B measurement (rockyou+OneRule vs nocap+nocap.rule on identical hashes) is planned.*
+
+## Performance
+
+Keyspace and estimated run times for common attack pairings:
+
+| Wordlist | Rule | Keyspace | RTX 4060 Ti | RTX 4090 |
+|----------|------|----------|-------------|----------|
+| `nocap.txt` | `nocap.rule` | 695B | ~1.5 min | ~20s |
+| `nocap-plus.txt` | `nocap.rule` | 699B | ~1.5 min | ~20s |
+| `nocap-plus.txt` | `UNOBTAINIUM.rule` | 2.8B | ~0.4s | ~0.1s |
+
+*Times are for SHA-1 (mode 100) with `-O` optimized kernels. MD5/NTLM will be faster, bcrypt/scrypt dramatically slower.*
+
+The keyspace for `nocap.txt + nocap.rule` is comparable to `rockyou.txt + OneRuleToRuleThemStill` — no significant time penalty for the additional coverage.
 
 ## Methodology
 
@@ -149,6 +185,35 @@ hashcat -m 0 hashes.txt nocap-plus.txt -r nocap.rule
 # Surgical attack
 hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
 ```
+
+### Both Rules Combined
+
+```bash
+# Run surgical first (fast), then broad
+hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
+hashcat -m 0 hashes.txt nocap-plus.txt -r nocap.rule
+```
+
+## Responsible Use
+
+These wordlists and rules are provided for **authorized security testing only**:
+
+- Penetration testing with written authorization
+- CTF competitions and security challenges
+- Security research and password policy evaluation
+- Auditing your own accounts and systems
+
+Do not use these tools for unauthorized access to systems or accounts you do not own or have explicit permission to test. Unauthorized access to computer systems is illegal in most jurisdictions.
+
+## Version
+
+**Current release:** v1.0 (February 2026)
+
+Wordlists and rules are actively maintained. New roots and patterns are added as they are discovered and validated through the feedback pipeline.
+
+| Date | Change |
+|------|--------|
+| 2026-02 | Initial release — nocap.txt, nocap-plus.txt, nocap.rule, UNOBTAINIUM.rule |
 
 ## Acknowledgments
 
