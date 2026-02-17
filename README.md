@@ -85,7 +85,11 @@ Cohort wordlists target specific linguistic and cultural communities with dedica
 
 Drop-in replacement for [OneRuleToRuleThemAll](https://github.com/NotSoSecure/password_cracking_rules) / [OneRuleToRuleThemStill](https://github.com/stealthsploit/OneRuleToRuleThemStill).
 
-Built on the OneRule foundation — the community's most widely used hashcat rule set — with additions derived from analyzing hundreds of thousands of cracked HIBP passwords. New rules target modern patterns (recent year suffixes, digit prepends, special character combos) that the original OneRule predates. Deduplicated and optimized for speed — no redundant or conflicting rules.
+```
+OneRuleToRuleThemStill.rule + bussin.rule = nocap.rule
+```
+
+Built on the OneRule foundation — the community's most widely used hashcat rule set. `bussin.rule` adds modern patterns (recent year suffixes 2015–2025, digit prepends, special character combos) that the original OneRule predates, carefully inserted to optimize rule execution order for performance. Deduplicated — no redundant or conflicting rules.
 
 ```bash
 # Instead of:
