@@ -1,3 +1,2 @@
 nocap.txt filter=lfs diff=lfs merge=lfs -text
 nocap-plus.txt filter=lfs diff=lfs merge=lfs -text
-*.txt.gz filter=lfs diff=lfs merge=lfs -text
