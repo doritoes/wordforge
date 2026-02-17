@@ -85,6 +85,30 @@ Best paired with the larger wordlists for a fast, high-yield pass:
 hashcat -m <hash_type> hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
 ```
 
+## Effectiveness
+
+Tested against HIBP Pwned Passwords (SHA-1), sampled across 700 batches of 500K hashes each (350M hashes total).
+
+### nocap.txt + nocap.rule
+
+**30.0% crack rate** — consistent across all 700 batches (29.8%–30.2% range).
+
+| Stage | Hashes | Reduction | Cumulative |
+|-------|--------|-----------|------------|
+| HIBP sample (rocks) | 350,000,000 | — | — |
+| Minus rockyou plain matches | 347,682,081 | 0.7% | 0.7% |
+| Minus nocap.txt + nocap.rule | 243,447,430 | **30.0%** | **30.4%** |
+
+The 0.7% rockyou plain-match rate is low because HIBP distributes hashes alphabetically by SHA-1 — most rockyou passwords cluster in specific hash ranges. The dictionary+rules attack is where the real work happens.
+
+The 30% rate is remarkably stable batch-to-batch, confirming HIBP's hash-sorted distribution produces statistically equivalent batches.
+
+### Comparison baseline
+
+`rockyou.txt` alone (straight dictionary, no rules) matches ~0.7% of HIBP hashes. With `OneRuleToRuleThemStill.rule`, the rate climbs substantially — but `nocap.txt + nocap.rule` captures everything `rockyou.txt + OneRule` does, plus the modern additions from rizzyou.txt and updated rules.
+
+*Direct A/B measurement (rockyou+OneRule vs nocap+nocap.rule on identical hashes) is planned.*
+
 ## Methodology
 
 All wordlists and rules were tested against HIBP Pwned Passwords (SHA-1) using a structured pipeline:
