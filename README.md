@@ -99,9 +99,9 @@ Tested against HIBP Pwned Passwords (SHA-1), sampled across 700 batches of 500K 
 | Minus rockyou plain matches | 347,682,081 | 0.7% | 0.7% |
 | Minus nocap.txt + nocap.rule | 243,447,430 | **30.0%** | **30.4%** |
 
-The 0.7% rockyou plain-match rate is low because HIBP distributes hashes alphabetically by SHA-1 — most rockyou passwords cluster in specific hash ranges. The dictionary+rules attack is where the real work happens.
+The 0.7% rockyou plain-match rate reflects straight dictionary lookup — no rules, no transformations. The dictionary+rules attack is where the real work happens.
 
-The 30% rate is remarkably stable batch-to-batch, confirming HIBP's hash-sorted distribution produces statistically equivalent batches.
+The 30% rate is remarkably stable batch-to-batch, confirming that HIBP batches are statistically equivalent samples of the full password space.
 
 ### Comparison baseline
 
