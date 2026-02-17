@@ -24,7 +24,7 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 |------|---------|------|-------------|
 | `nocap.txt` | 14.3M | 134 MB | Drop-in `rockyou.txt` replacement |
 | `nocap-plus.txt` | 14.4M | 148 MB | Extended with multilingual cohorts |
-| `rizzyou.txt` | 70K+ | — | New roots only (the wordforge supplement) |
+| `rizzyou.txt` | 203 | 10 KB | New roots only (the wordforge supplement) |
 | `nocap.rule` | 48.5K | 476 KB | Drop-in `OneRuleToRuleThemStill` replacement |
 | `UNOBTAINIUM.rule` | 194 | 8.7 KB | Surgical high-value rules |
 
