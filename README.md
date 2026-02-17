@@ -61,19 +61,25 @@ Cohort wordlists target specific linguistic and cultural communities with dedica
 
 ### nocap.rule
 
-Comprehensive rule set for broad password transformation coverage. Pair with wordlists for dictionary+rules attacks.
+Drop-in replacement for [OneRuleToRuleThemAll](https://github.com/NotSoSecure/password_cracking_rules) / [OneRuleToRuleThemStill](https://github.com/stealthsploit/OneRuleToRuleThemStill).
+
+Built on the OneRule foundation — the community's most widely used hashcat rule set — with additions derived from analyzing hundreds of thousands of cracked HIBP passwords. New rules target modern patterns (recent year suffixes, digit prepends, special character combos) that the original OneRule predates. Deduplicated and optimized for speed — no redundant or conflicting rules.
 
 ```bash
-hashcat -m <hash_type> hashes.txt nocap.txt -r nocap.rule
+# Instead of:
+hashcat -m 0 hashes.txt rockyou.txt -r OneRuleToRuleThemStill.rule
+
+# Use:
+hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 ```
 
 ### UNOBTAINIUM.rule
 
-Surgical, high-value rule set derived from analyzing hundreds of thousands of cracked passwords. Each rule earned its place through measured crack contribution — no filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (~48K rules), UNOBTAINIUM.rule is minimal (~194 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
-Includes digit prepends/appends, year suffixes, capitalize+suffix combos, leet substitutions, and special character patterns that produce disproportionate results.
+Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes, capitalize+suffix combos, leet substitutions, and special character patterns.
 
-Best paired with the larger wordlists:
+Best paired with the larger wordlists for a fast, high-yield pass:
 
 ```bash
 hashcat -m <hash_type> hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
@@ -119,6 +125,13 @@ hashcat -m 0 hashes.txt nocap-plus.txt -r nocap.rule
 # Surgical attack
 hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
 ```
+
+## Acknowledgments
+
+- [rockyou.txt](https://en.wikipedia.org/wiki/RockYou#Data_breach) — The 2009 RockYou breach that gave the community its foundational wordlist
+- [OneRuleToRuleThemAll](https://github.com/NotSoSecure/password_cracking_rules) by NotSoSecure — The original combined hashcat rule set
+- [OneRuleToRuleThemStill](https://github.com/stealthsploit/OneRuleToRuleThemStill) by stealthsploit — Updated and deduplicated OneRule successor
+- [HIBP Pwned Passwords](https://haveibeenpwned.com/Passwords) by Troy Hunt — Breach frequency data used for validation and testing
 
 ## License
 
