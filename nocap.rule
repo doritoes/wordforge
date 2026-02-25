@@ -1,3 +1,9 @@
+# nocap.rule - OneRuleToRuleThemStill + bussin.rule (deduplicated)
+# Built: 2026-02-25
+# OneRuleToRuleThemStill: 48414 rules
+# bussin.rule additions: 14 rules (unique only)
+# Total: 48428 rules
+#
 ##################################################################
 # ***              OneRuleToRuleThemStill                    *** #
 #       							 #
@@ -11,7 +17,7 @@
 #      (previously literal strings only)                	 #
 #    - Added LastFM breach dataset (~21m unique hashes)   	 #
 #    - Common non-matching rules removed (Lifeboat and LastFM) 	 #
-#    - Ordered by frequency against LastFM                     	 # 
+#    - Ordered by frequency against LastFM                     	 #
 #                                                              	 #
 #    Blog: https://in.security/2023/01/10/                       #
 #          oneruletorulethemstill-new-and-improved/              #
@@ -777,50 +783,6 @@ T0 i89
 ss1 $9 $7 $4
 [ ^W
 $2 $0 $1 $1
-# GenZ year rules (2015-2025) inserted for high priority matching
-# Years 2015-2019 (base append)
-$2 $0 $1 $5
-$2 $0 $1 $6
-$2 $0 $1 $7
-$2 $0 $1 $8
-$2 $0 $1 $9
-# Years 2020-2025 (base append) - Most relevant for GenZ
-$2 $0 $2 $0
-$2 $0 $2 $1
-$2 $0 $2 $2
-$2 $0 $2 $3
-$2 $0 $2 $4
-$2 $0 $2 $5
-# Capitalize first + year (2015-2025)
-c $2 $0 $1 $5
-c $2 $0 $1 $6
-c $2 $0 $1 $7
-c $2 $0 $1 $8
-c $2 $0 $1 $9
-c $2 $0 $2 $0
-c $2 $0 $2 $1
-c $2 $0 $2 $2
-c $2 $0 $2 $3
-c $2 $0 $2 $4
-c $2 $0 $2 $5
-# Lowercase + year (2015-2025)
-l $2 $0 $1 $5
-l $2 $0 $1 $6
-l $2 $0 $1 $7
-l $2 $0 $1 $8
-l $2 $0 $1 $9
-l $2 $0 $2 $0
-l $2 $0 $2 $1
-l $2 $0 $2 $2
-l $2 $0 $2 $3
-l $2 $0 $2 $4
-l $2 $0 $2 $5
-# GenZ emoticons
-$u $w $u
-$o $w $o
-$: $3
-$< $3
-# End GenZ high-priority insertions
 o8.
 l $6 $7
 Y2 K D5
@@ -48257,11 +48219,6 @@ $" D0 '3
 @* +3
 $. $b
 $0
-$1
-$2
-$3
-$5
-$7
 $0 D5 $3
 $1 $2
 $1 $2 $3
@@ -48486,3 +48443,22 @@ o6T i6Y
 o6i c
 o9y
 y2
+
+
+# =============================================================================
+# bussin.rule additions (not in OneRuleToRuleThemStill)
+# =============================================================================
+$1
+$2
+$3
+$5
+$7
+$2 $2
+$1 $1 $1
+$2 $2 $2
+$3 $3 $3
+$5 $5 $5
+$6 $6 $6
+$7 $7 $7
+$8 $8 $8
+$9 $9 $9
