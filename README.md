@@ -25,8 +25,9 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 | `nocap.txt` | 14.3M | 134 MB | 51 MB (.gz) | Drop-in `rockyou.txt` replacement |
 | `nocap-plus.txt` | 14.4M | 148 MB | 86 MB (.gz) | Extended with multilingual cohorts |
 | `rizzyou.txt` | 203 | 10 KB | — | New roots only (the wordforge supplement) |
-| `nocap.rule` | 48.5K | 476 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
-| `UNOBTAINIUM.rule` | 205 | 3.2 KB | — | Surgical high-value rules |
+| `nocap.rule` | 48,428 | 476 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
+| `bussin.rule` | 14 | <1 KB | — | Supplement rules not in OneRule |
+| `UNOBTAINIUM.rule` | 248 | 8.7 KB | — | Surgical high-value rules |
 
 All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
 
@@ -89,7 +90,17 @@ Drop-in replacement for [OneRuleToRuleThemAll](https://github.com/NotSoSecure/pa
 OneRuleToRuleThemStill.rule + bussin.rule = nocap.rule
 ```
 
-Built on the OneRule foundation — the community's most widely used hashcat rule set. `bussin.rule` adds modern patterns (recent year suffixes 2015–2025, digit prepends, special character combos) that the original OneRule predates, carefully inserted to optimize rule execution order for performance. Deduplicated — no redundant or conflicting rules.
+Built on the OneRule foundation — the community's most widely used hashcat rule set. `bussin.rule` adds rules genuinely missing from OneRule, discovered through analysis of 593K cracked HIBP passwords. Deduplicated with space-normalized comparison (hashcat treats `$2$0$1$5` and `$2 $0 $1 $5` identically). 48,428 unique rules, zero duplicates.
+
+### bussin.rule
+
+The supplement that makes nocap.rule more than just OneRule. Contains **only** rules verified as missing from OneRuleToRuleThemStill (14 rules):
+
+- **Single-digit appends**: `$1 $2 $3 $5 $7` — OneRule has `$0 $4 $6 $8 $9` but omits these five
+- **Short year**: `$2 $2` — the only 2-digit year suffix not in OneRule
+- **Triple-digit repeats**: `$1 $1 $1` through `$9 $9 $9` — OneRule only has `$4 $4 $4`
+
+Every rule was confirmed missing through normalized comparison against OneRule's 48,414 rules and validated against real crack data.
 
 ```bash
 # Instead of:
@@ -101,7 +112,7 @@ hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 
 ### UNOBTAINIUM.rule
 
-Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (194 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (248 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
 Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes, capitalize+suffix combos, leet substitutions, and special character patterns.
 
@@ -143,7 +154,7 @@ Keyspace and estimated run times for common attack pairings:
 |----------|------|----------|-------------|----------|
 | `nocap.txt` | `nocap.rule` | 695B | ~1.5 min | ~20s |
 | `nocap-plus.txt` | `nocap.rule` | 699B | ~1.5 min | ~20s |
-| `nocap-plus.txt` | `UNOBTAINIUM.rule` | 2.8B | ~0.4s | ~0.1s |
+| `nocap-plus.txt` | `UNOBTAINIUM.rule` | 3.6B | ~0.5s | ~0.1s |
 
 *Times are for SHA-1 (mode 100) with `-O` optimized kernels. MD5/NTLM will be faster, bcrypt/scrypt dramatically slower.*
 
@@ -217,6 +228,7 @@ Wordlists and rules are actively maintained. New roots and patterns are added as
 
 | Date | Change |
 |------|--------|
+| 2026-02-25 | bussin.rule audit — stripped 65 spacing-variant duplicates, 14 truly unique rules remain. nocap.rule rebuilt with space-normalized dedup (48,428 rules, 0 duplicates). UNOBTAINIUM.rule expanded to 248 rules (keyboard suffixes, prepends, special combos) |
 | 2026-02 | Initial release — nocap.txt, nocap-plus.txt, nocap.rule, UNOBTAINIUM.rule |
 
 ## Acknowledgments
