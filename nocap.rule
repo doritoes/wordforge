@@ -1,9 +1,3 @@
-# nocap.rule - OneRuleToRuleThemStill + bussin.rule (deduplicated)
-# Built: 2026-02-25
-# OneRuleToRuleThemStill: 48414 rules
-# bussin.rule additions: 14 rules (unique only)
-# Total: 48428 rules
-#
 ##################################################################
 # ***              OneRuleToRuleThemStill                    *** #
 #       							 #
@@ -17,7 +11,7 @@
 #      (previously literal strings only)                	 #
 #    - Added LastFM breach dataset (~21m unique hashes)   	 #
 #    - Common non-matching rules removed (Lifeboat and LastFM) 	 #
-#    - Ordered by frequency against LastFM                     	 #
+#    - Ordered by frequency against LastFM                     	 # 
 #                                                              	 #
 #    Blog: https://in.security/2023/01/10/                       #
 #          oneruletorulethemstill-new-and-improved/              #
@@ -11911,6 +11905,14 @@ $k [
 $8 $5 $2
 $5 $1 $3
 $4 $4 $4
+$1 $1 $1
+$2 $2 $2
+$3 $3 $3
+$5 $5 $5
+$6 $6 $6
+$7 $7 $7
+$8 $8 $8
+$9 $9 $9
 $2 $0 $2
 $! [
 $! D9
@@ -48220,6 +48222,7 @@ $" D0 '3
 $. $b
 $0
 $0 D5 $3
+$1
 $1 $2
 $1 $2 $3
 $1 $3
@@ -48238,23 +48241,28 @@ $1 o4e
 $1 o5e
 $1 o5l
 $1 o6a
+$2
 $2 $1
+$2 $2
 $2 *32
 $2 ,3
 $2 T0
 $2 Z1
 $2 i31
 $2 o5e
+$3
 $3 $1
 $3 *56
 $3 D1
 $4
 $4 $0
 $4 D1
+$5
 $5 *76
 $5 R4
 $5 o1e
 $6
+$7
 $7 +0 t
 $7 Z1 D2
 $7 [
@@ -48443,22 +48451,3 @@ o6T i6Y
 o6i c
 o9y
 y2
-
-
-# =============================================================================
-# bussin.rule additions (not in OneRuleToRuleThemStill)
-# =============================================================================
-$1
-$2
-$3
-$5
-$7
-$2 $2
-$1 $1 $1
-$2 $2 $2
-$3 $3 $3
-$5 $5 $5
-$6 $6 $6
-$7 $7 $7
-$8 $8 $8
-$9 $9 $9
