@@ -1,4 +1,17 @@
 ##################################################################
+# ***                    nocap.rule                          *** #
+#                                                                #
+#    OneRuleToRuleThemStill + bussin.rule                        #
+#    https://github.com/doritoes/wordforge                       #
+#                                                                #
+#    48,428 rules = 48,414 (OneRule) + 14 (bussin, unique only)  #
+#    bussin.rule additions inserted at performance-correct       #
+#    locations within OneRule's frequency-ordered structure.      #
+#    Space-normalized dedup — zero duplicates.                   #
+#                                                                #
+##################################################################
+#
+##################################################################
 # ***              OneRuleToRuleThemStill                    *** #
 #       							 #
 #    An optimised revamp of OneRuleToRuleThemAll                 #
