@@ -27,7 +27,7 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 | `rizzyou.txt` | 203 | 10 KB | — | New roots only (the wordforge supplement) |
 | `nocap.rule` | 48,428 | 476 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
 | `bussin.rule` | 14 | <1 KB | — | Supplement rules not in OneRule |
-| `UNOBTAINIUM.rule` | 248 | 8.7 KB | — | Surgical high-value rules |
+| `UNOBTAINIUM.rule` | 257 | 9.1 KB | — | Surgical high-value rules |
 
 All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
 
@@ -112,7 +112,7 @@ hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 
 ### UNOBTAINIUM.rule
 
-Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (248 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (257 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
 Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes, capitalize+suffix combos, leet substitutions, and special character patterns.
 
@@ -208,6 +208,78 @@ hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
 hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
 hashcat -m 0 hashes.txt nocap-plus.txt -r nocap.rule
 ```
+
+## Complementary Attacks
+
+Dictionary+rules attacks find passwords built from words. They do **not** replace brute-force and mask attacks, which cover passwords that no wordlist contains — random strings, phone numbers, PINs, and short passwords.
+
+A complete cracking workflow runs both. In our production pipeline against HIBP Pwned Passwords, dictionary+rules account for roughly 40% of total cracks. The other 60% come from brute-force and mask attacks.
+
+### Recommended non-rule attacks
+
+Run these alongside your dictionary+rules passes. Times are for SHA-1 on an RTX 4060 Ti with `-O`.
+
+**Brute-force (exhaustive — all printable characters):**
+
+```bash
+# Covers ALL passwords 1-7 characters. Non-negotiable.
+hashcat -m <hash_type> hashes.txt -a 3 ?a              # 1 char — instant
+hashcat -m <hash_type> hashes.txt -a 3 ?a?a             # 2 chars — instant
+hashcat -m <hash_type> hashes.txt -a 3 ?a?a?a            # 3 chars — instant
+hashcat -m <hash_type> hashes.txt -a 3 ?a?a?a?a           # 4 chars — instant
+hashcat -m <hash_type> hashes.txt -a 3 ?a?a?a?a?a          # 5 chars — ~1 sec
+hashcat -m <hash_type> hashes.txt -a 3 ?a?a?a?a?a?a         # 6 chars — ~1.7 min
+hashcat -m <hash_type> hashes.txt -a 3 ?a?a?a?a?a?a?a        # 7 chars — ~107 min
+```
+
+**Pure digit masks (phone numbers, PINs):**
+
+```bash
+# Essentially free — <2 minutes total for all four
+hashcat -m <hash_type> hashes.txt -a 3 ?d?d?d?d?d?d?d?d?d           # 9 digits — <1 sec
+hashcat -m <hash_type> hashes.txt -a 3 ?d?d?d?d?d?d?d?d?d?d          # 10 digits — ~1 sec
+hashcat -m <hash_type> hashes.txt -a 3 ?d?d?d?d?d?d?d?d?d?d?d         # 11 digits — ~9 sec
+hashcat -m <hash_type> hashes.txt -a 3 ?d?d?d?d?d?d?d?d?d?d?d?d        # 12 digits — ~92 sec
+```
+
+**8-char character class masks (the escalation ladder):**
+
+```bash
+# Each mask is a strict subset of the next — run cheapest first
+hashcat -m <hash_type> hashes.txt -a 3 ?l?l?l?l?l?l?l?l                    # lowercase 8 — ~19 sec
+hashcat -m <hash_type> hashes.txt -a 3 -1 ?l?d ?1?1?1?1?1?1?1?1            # lower+digit 8 — ~4.3 min
+```
+
+**9-10 char structured masks:**
+
+```bash
+hashcat -m <hash_type> hashes.txt -a 3 ?l?l?l?l?l?l?l?l?l                  # lowercase 9 — ~10 min
+hashcat -m <hash_type> hashes.txt -a 3 ?u?l?l?l?l?l?l?l?d                  # Cap+7lower+1digit — ~8 sec
+hashcat -m <hash_type> hashes.txt -a 3 ?u?l?l?l?l?l?d?d                    # Cap+5lower+2digit — ~5 sec
+hashcat -m <hash_type> hashes.txt -a 3 ?u?l?l?l?l?l?l?l?d?d                # Cap+7lower+2digit — ~32 min
+```
+
+**Hybrid attacks (dictionary + digit/character suffix):**
+
+```bash
+# Catches "password1234", "monkey2024!", etc.
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?d             # word + 4 digits — ~36 sec
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?d?d           # word + 5 digits — ~3 min
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?a?a?a               # word + 3 any — ~23 min
+```
+
+### Suggested run order
+
+1. Brute-force 1-6 chars (instant)
+2. Digit masks 9-12 (instant)
+3. 8-char lowercase + lowercase+digit masks (~5 min)
+4. Dictionary + UNOBTAINIUM.rule (<1 sec)
+5. Dictionary + nocap.rule (~1.5 min)
+6. Brute-force 7 chars (~107 min)
+7. Hybrid attacks (~25 min)
+8. 9-10 char structured masks (~50 min)
+
+Total: roughly 3.5 hours for a thorough pass on SHA-1.
 
 ## Responsible Use
 
