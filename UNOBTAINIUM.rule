@@ -3,11 +3,11 @@
 # PURPOSE: Rules discovered from cracked passwords (DIAMONDS) that are
 #          NOT already covered by OneRuleToRuleThemStill.rule or nocap.rule.
 #
-# Generated: 2026-02-25T20:09:18.594Z
-# Batches analyzed: passwords-batch-0018
-# Total passwords: 57,301
-# Baseline filtered: 114 rules (already in OneRule/nocap)
-# New rules: 239
+# Generated: 2026-02-27T07:36:37.766Z
+# Batches analyzed: passwords-batch-0023
+# Total passwords: 65,679
+# Baseline filtered: 113 rules (already in OneRule/nocap)
+# New rules: 258
 
 # NEW pattern-based rules (not in baseline)
 c
@@ -16,13 +16,14 @@ l
 $! $@
 $8 $8
 $1 $1
-$9 $9
 $7 $7
-$0 $0
+$9 $9
 $3 $3
+$0 $0
 $4 $4
 $6 $6
 $5 $5
+$! $!
 sa@ se3 si1 so0
 
 # Deep analysis Gen2 batches 0001-0011: 308,688 diamonds, diffed against nocap.rule (48,428 rules)

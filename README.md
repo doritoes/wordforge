@@ -23,11 +23,11 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 | File | Entries | Size | Compressed | Description |
 |------|---------|------|------------|-------------|
 | `nocap.txt` | 14.3M | 134 MB | 51 MB (.gz) | Drop-in `rockyou.txt` replacement |
-| `nocap-plus.txt` | 14.4M | 148 MB | 86 MB (.gz) | Extended with multilingual cohorts |
+| `nocap-plus.txt` | 14.41M | 148 MB | 86 MB (.gz) | Extended with multilingual cohorts |
 | `rizzyou.txt` | 203 | 10 KB | — | New roots only (the wordforge supplement) |
 | `nocap.rule` | 48,428 | 476 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
 | `bussin.rule` | 14 | <1 KB | — | Supplement rules not in OneRule |
-| `UNOBTAINIUM.rule` | 257 | 9.1 KB | — | Surgical high-value rules |
+| `UNOBTAINIUM.rule` | 258 | 3.4 KB | — | Surgical high-value rules |
 
 All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
 
@@ -112,9 +112,9 @@ hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 
 ### UNOBTAINIUM.rule
 
-Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (257 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (258 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
-Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes, capitalize+suffix combos, leet substitutions, and special character patterns.
+Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes (including 5-char year+special patterns like `$2$0$2$4$!`), capitalize+suffix combos, keyboard walk suffixes, leet substitutions, and special character patterns.
 
 Best paired with the larger wordlists for a fast, high-yield pass:
 
@@ -154,7 +154,7 @@ Keyspace and estimated run times for common attack pairings:
 |----------|------|----------|-------------|----------|
 | `nocap.txt` | `nocap.rule` | 695B | ~1.5 min | ~20s |
 | `nocap-plus.txt` | `nocap.rule` | 699B | ~1.5 min | ~20s |
-| `nocap-plus.txt` | `UNOBTAINIUM.rule` | 3.6B | ~0.5s | ~0.1s |
+| `nocap-plus.txt` | `UNOBTAINIUM.rule` | 3.7B | ~0.5s | ~0.1s |
 
 *Times are for SHA-1 (mode 100) with `-O` optimized kernels. MD5/NTLM will be faster, bcrypt/scrypt dramatically slower.*
 
@@ -259,14 +259,24 @@ hashcat -m <hash_type> hashes.txt -a 3 ?u?l?l?l?l?l?d?d                    # Cap
 hashcat -m <hash_type> hashes.txt -a 3 ?u?l?l?l?l?l?l?l?d?d                # Cap+7lower+2digit — ~32 min
 ```
 
-**Hybrid attacks (dictionary + digit/character suffix):**
+**Hybrid attacks — word + suffix (`-a 6`):**
 
 ```bash
-# Catches "password1234", "monkey2024!", etc.
-hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?d             # word + 4 digits — ~36 sec
+# Digit suffixes — catches "password1234", "monkey20241"
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?d             # word + 4 digits — ~6 sec
 hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?d?d           # word + 5 digits — ~3 min
-hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?a?a?a               # word + 3 any — ~23 min
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?a?a?a               # word + 3 any chars — ~25 min
+
+# Digit+special suffixes — catches "password123!", "monkey2024@"
+# Analysis of 18.5M complex passwords shows 47% have digit+special suffix structure
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?s             # word + 3 digits + 1 special — ~2 min
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?d?d?d?d?s           # word + 4 digits + 1 special — ~19 min
+
+# Special+digit prefix — catches "password!123"
+hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?s?d?d?d             # word + 1 special + 3 digits — ~2 min
 ```
+
+**Note on hybrid speed:** Hybrid attacks (`-a 6` / `-a 7`) with large dictionaries like `nocap-plus.txt` (148 MB) run at roughly **0.37x mask speed** due to dictionary I/O. On an RTX 4060 Ti, expect ~4 GH/s for SHA-1 hybrids vs ~10.9 GH/s for pure masks. Smaller dictionaries (under 10 MB) run at ~0.74x mask speed.
 
 ### Suggested run order
 
@@ -275,9 +285,10 @@ hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?a?a?a               # wor
 3. 8-char lowercase + lowercase+digit masks (~5 min)
 4. Dictionary + UNOBTAINIUM.rule (<1 sec)
 5. Dictionary + nocap.rule (~1.5 min)
-6. Brute-force 7 chars (~107 min)
-7. Hybrid attacks (~25 min)
+6. Hybrid word + 4 digits + word + 3d1s (~8 sec + ~2 min)
+7. Brute-force 7 chars (~107 min)
 8. 9-10 char structured masks (~50 min)
+9. Extended hybrids: word + 5 digits, word + 3 any, word + 4d1s (~47 min)
 
 Total: roughly 3.5 hours for a thorough pass on SHA-1.
 
@@ -300,6 +311,7 @@ Wordlists and rules are actively maintained. New roots and patterns are added as
 
 | Date | Change |
 |------|--------|
+| 2026-02-27 | UNOBTAINIUM.rule updated to 258 rules (year+special suffix patterns, batch-0023 feedback). nocap-plus.txt updated (+81 roots from feedback loop). Expanded complementary attacks section with measured hybrid ROI data and digit+special suffix attacks. Added hybrid speed note. |
 | 2026-02-25 | bussin.rule audit — stripped 65 spacing-variant duplicates, 14 truly unique rules remain. nocap.rule rebuilt with space-normalized dedup (48,428 rules, 0 duplicates). UNOBTAINIUM.rule expanded to 248 rules (keyboard suffixes, prepends, special combos) |
 | 2026-02 | Initial release — nocap.txt, nocap-plus.txt, nocap.rule, UNOBTAINIUM.rule |
 
