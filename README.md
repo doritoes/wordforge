@@ -24,10 +24,10 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 |------|---------|------|------------|-------------|
 | `nocap.txt` | 14.3M | 134 MB | 51 MB (.gz) | Drop-in `rockyou.txt` replacement |
 | `nocap-plus.txt` | 14.41M | 148 MB | 86 MB (.gz) | Extended with multilingual cohorts |
-| `rizzyou.txt` | 203 | 10 KB | — | New roots only (the wordforge supplement) |
-| `nocap.rule` | 48,428 | 476 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
-| `bussin.rule` | 14 | <1 KB | — | Supplement rules not in OneRule |
-| `UNOBTAINIUM.rule` | 258 | 3.4 KB | — | Surgical high-value rules |
+| `rizzyou.txt` | 203 | 2 KB | — | GenZ supplement (clean wordlist, one word per line) |
+| `nocap.rule` | 48,452 | 477 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
+| `bussin.rule` | 38 | <1 KB | — | Supplement rules not in OneRule |
+| `UNOBTAINIUM.rule` | 265 | 3.2 KB | — | Surgical high-value rules |
 
 All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
 
@@ -35,13 +35,17 @@ All files are UTF-8, one entry per line, compatible with hashcat and John the Ri
 
 ### rizzyou.txt
 
-The core wordforge wordlist. Contains modern password roots discovered through:
+GenZ-era password roots that `rockyou.txt` cannot contain — the RockYou breach was in 2009, before Minecraft, Fortnite, BTS, TikTok, and Bitcoin existed. 203 words, clean wordlist (one word per line, no comments). Every term has zero matches in rockyou.txt and 1,000+ appearances in HIBP Pwned Passwords.
 
-- Markov chain phrase generation across English, Spanish, and French corpora
-- Cultural and multilingual pattern mining (Turkish, Indian, Arabic, Slavic, Chinese Pinyin, Korean, Portuguese-Brazilian)
-- HIBP Pwned Passwords frequency validation — every root confirmed in real-world breaches
-- Leet-speak and number-substitution patterns (`ready2go`, `just4fun`)
-- Media, gaming, music, and meme references
+Categories: gaming, music, K-pop, streamers/YouTubers, anime, movies/TV, memes, Gen Z slang, social platforms, apps, crypto, AI, COVID era, sports, streetwear.
+
+```bash
+# Use rizzyou.txt standalone with rules
+hashcat -m <hash_type> hashes.txt rizzyou.txt -r OneRuleToRuleThemStill.rule
+
+# Or combine with rockyou.txt to create nocap.txt
+cat rockyou.txt rizzyou.txt > nocap.txt
+```
 
 ### nocap.txt
 
@@ -90,15 +94,19 @@ Drop-in replacement for [OneRuleToRuleThemAll](https://github.com/NotSoSecure/pa
 OneRuleToRuleThemStill.rule + bussin.rule = nocap.rule
 ```
 
-Built on the OneRule foundation — the community's most widely used hashcat rule set. `bussin.rule` adds rules genuinely missing from OneRule, discovered through analysis of 593K cracked HIBP passwords. Deduplicated with space-normalized comparison (hashcat treats `$2$0$1$5` and `$2 $0 $1 $5` identically). 48,428 unique rules, zero duplicates.
+Built on the OneRule foundation — the community's most widely used hashcat rule set. `bussin.rule` adds rules genuinely missing from OneRule, discovered through analysis of 11.5M+ cracked HIBP passwords. Deduplicated with space-normalized comparison (hashcat treats `$2$0$1$5` and `$2 $0 $1 $5` identically). 48,452 unique rules, zero duplicates.
 
 ### bussin.rule
 
-The supplement that makes nocap.rule more than just OneRule. Contains **only** rules verified as missing from OneRuleToRuleThemStill (14 rules):
+The supplement that makes nocap.rule more than just OneRule. Contains **only** rules verified as missing from OneRuleToRuleThemStill (38 rules):
 
 - **Single-digit appends**: `$1 $2 $3 $5 $7` — OneRule has `$0 $4 $6 $8 $9` but omits these five
+- **Single-digit prepends**: `^0` through `^9` — highest-hit rules discovered (1,052-1,725 diamond hits each)
+- **Double-digit appends**: `$0 $0` through `$9 $9` — OneRule only has none of these
 - **Short year**: `$2 $2` — the only 2-digit year suffix not in OneRule
 - **Triple-digit repeats**: `$1 $1 $1` through `$9 $9 $9` — OneRule only has `$4 $4 $4`
+- **Core leet substitution**: `sa@ se3 si1 so0` — fundamental a→@, e→3, i→1, o→0 transform
+- **Keyboard walk suffixes**: `$q $w $e`, `$a $s $d`, `$z $x $c`, `$q $a $z` — universal keyboard patterns
 
 Every rule was confirmed missing through normalized comparison against OneRule's 48,414 rules and validated against real crack data.
 
@@ -112,7 +120,7 @@ hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 
 ### UNOBTAINIUM.rule
 
-Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (258 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (265 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
 Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes (including 5-char year+special patterns like `$2$0$2$4$!`), capitalize+suffix combos, keyboard walk suffixes, leet substitutions, and special character patterns.
 
