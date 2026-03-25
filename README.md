@@ -14,8 +14,11 @@ Modern password wordlists and rules to supplement `rockyou.txt`.
 # Clone the repo
 git clone https://github.com/doritoes/wordforge.git
 
-# Replace rockyou.txt in your workflow
+# Drop-in replacement for rockyou.txt + OneRule
 hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
+
+# Or use the thicc profile for maximum coverage (+0.25pp over rockyou)
+hashcat -m <hash_type> hashes.txt wordforge/thicc.txt -r wordforge/thicc.rule
 ```
 
 ## Files at a Glance
@@ -23,11 +26,12 @@ hashcat -m <hash_type> hashes.txt wordforge/nocap.txt -r wordforge/nocap.rule
 | File | Entries | Size | Compressed | Description |
 |------|---------|------|------------|-------------|
 | `nocap.txt` | 14.3M | 134 MB | 51 MB (.gz) | Drop-in `rockyou.txt` replacement |
-| `nocap-plus.txt` | 14.41M | 148 MB | 86 MB (.gz) | Extended with multilingual cohorts |
-| `rizzyou.txt` | 203 | 2 KB | — | GenZ supplement (clean wordlist, one word per line) |
 | `nocap.rule` | 48,452 | 477 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
+| `thicc.txt` | 14.4M | 134 MB | — | nocap.txt + multilingual cohorts |
+| `thicc.rule` | 48,715 | 477 KB | — | nocap.rule + unobtainium.rule |
+| `rizzyou.txt` | 223 | 2 KB | — | GenZ supplement (one word per line) |
 | `bussin.rule` | 38 | <1 KB | — | Supplement rules not in OneRule |
-| `UNOBTAINIUM.rule` | 265 | 3.2 KB | — | Surgical high-value rules |
+| `unobtainium.rule` | 263 | 3.2 KB | — | Surgical high-value rules |
 
 All files are UTF-8, one entry per line, compatible with hashcat and John the Ripper.
 
@@ -118,41 +122,37 @@ hashcat -m 0 hashes.txt rockyou.txt -r OneRuleToRuleThemStill.rule
 hashcat -m 0 hashes.txt nocap.txt -r nocap.rule
 ```
 
-### UNOBTAINIUM.rule
+### unobtainium.rule
 
-Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), UNOBTAINIUM.rule is minimal (265 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
+Surgical, high-value rule set — the opposite philosophy from nocap.rule. Where nocap.rule is comprehensive (48.5K rules), unobtainium.rule is minimal (263 rules) with every rule earning its place through measured crack contribution against HIBP data. No filler.
 
-Derived by analyzing hundreds of thousands of cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes (including 5-char year+special patterns like `$2$0$2$4$!`), capitalize+suffix combos, keyboard walk suffixes, leet substitutions, and special character patterns.
+Derived by analyzing 25.9 million cracked passwords, identifying transformation patterns that produce disproportionate results, and diffing against nocap.rule to capture what the broad set misses. Includes digit prepends/appends, year suffixes (including 5-char year+special patterns like `$2$0$2$4$!`), capitalize+suffix combos, keyboard walk suffixes, leet substitutions, and special character patterns.
 
 Best paired with the larger wordlists for a fast, high-yield pass:
 
 ```bash
-hashcat -m <hash_type> hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
+hashcat -m <hash_type> hashes.txt nocap-plus.txt -r unobtainium.rule
 ```
 
 ## Effectiveness
 
-Tested against HIBP Pwned Passwords (SHA-1), sampled across 700 batches of 500K hashes each (350M hashes total).
+Tested against HIBP Pwned Passwords (SHA-1). All three profiles benchmarked on the same 10-batch gravel sample (4,967,165 hashes, evenly spaced across 4,328 batches):
 
-### nocap.txt + nocap.rule
+| Attack | Cracked | Rate | Time (RTX 4060 Ti) |
+|--------|---------|------|--------------------|
+| `rockyou.txt` + `OneRuleToRuleThemStill.rule` | 1,488,273 | **29.96%** | ~171s |
+| `nocap.txt` + `nocap.rule` | 1,490,372 | **30.00%** | 171.5s |
+| `thicc.txt` + `thicc.rule` | 1,500,730 | **30.21%** | 171.2s |
 
-**30.0% crack rate** — consistent across all 700 batches (29.8%–30.2% range).
+### Analysis
 
-| Stage | Hashes | Reduction | Cumulative |
-|-------|--------|-----------|------------|
-| HIBP sample (rocks) | 350,000,000 | — | — |
-| Minus rockyou plain matches | 347,682,081 | 0.7% | 0.7% |
-| Minus nocap.txt + nocap.rule | 243,447,430 | **30.0%** | **30.4%** |
+**nocap vs rockyou+OneRule (+0.04pp):** Effectively identical. nocap.txt is a safe drop-in replacement — same performance, same run time, with modern cultural coverage baked in.
 
-The 0.7% rockyou plain-match rate reflects straight dictionary lookup — no rules, no transformations. The dictionary+rules attack is where the real work happens.
+**thicc vs rockyou+OneRule (+0.25pp):** The cohort wordlists and unobtainium rules produce a measurable improvement. 0.25 percentage points sounds small, but projected across the full 2.15 billion HIBP hash corpus, that delta represents approximately **5.4 million additional cracked passwords** — real passwords that rockyou+OneRule misses entirely. Run time is identical.
 
-The 30% rate is remarkably stable batch-to-batch, confirming that HIBP batches are statistically equivalent samples of the full password space.
+**thicc vs nocap (+0.21pp):** The improvement comes from two sources: 12 multilingual cohort wordlists (Turkish, Arabic, Slavic, Chinese Pinyin, Korean, Portuguese, Indian, Spanish, French, English leet phrases, Markov-discovered roots) and 263 surgical rules derived from analyzing 25.9 million cracked HIBP passwords. Projected across HIBP: ~4.5 million additional cracks.
 
-### Comparison baseline
-
-`rockyou.txt` alone (straight dictionary, no rules) matches ~0.7% of HIBP hashes. With `OneRuleToRuleThemStill.rule`, the rate climbs substantially — but `nocap.txt + nocap.rule` captures everything `rockyou.txt + OneRule` does, plus the modern additions from rizzyou.txt and updated rules.
-
-*Direct A/B measurement (rockyou+OneRule vs nocap+nocap.rule on identical hashes) is planned.*
+The 30% rate is remarkably stable batch-to-batch (29.66%–30.33% range across all 4,328 batches), confirming that HIBP batches are statistically equivalent samples of the full password space.
 
 ## Performance
 
@@ -160,9 +160,9 @@ Keyspace and estimated run times for common attack pairings:
 
 | Wordlist | Rule | Keyspace | RTX 4060 Ti | RTX 4090 |
 |----------|------|----------|-------------|----------|
-| `nocap.txt` | `nocap.rule` | 695B | ~1.5 min | ~20s |
-| `nocap-plus.txt` | `nocap.rule` | 699B | ~1.5 min | ~20s |
-| `nocap-plus.txt` | `UNOBTAINIUM.rule` | 3.7B | ~0.5s | ~0.1s |
+| `nocap.txt` | `nocap.rule` | 695B | ~171s | ~20s |
+| `thicc.txt` | `thicc.rule` | 703B | ~171s | ~20s |
+| `nocap-plus.txt` | `unobtainium.rule` | 3.8B | ~0.5s | ~0.1s |
 
 *Times are for SHA-1 (mode 100) with `-O` optimized kernels. MD5/NTLM will be faster, bcrypt/scrypt dramatically slower.*
 
@@ -183,7 +183,7 @@ Pair incremental files with established counterparts for maximum effectiveness:
 
 | Wordlist | Rule | Purpose |
 |----------|------|---------|
-| `nocap-plus.txt` | `UNOBTAINIUM.rule` | High-value surgical cracks |
+| `nocap-plus.txt` | `unobtainium.rule` | High-value surgical cracks |
 | `nocap-plus.txt` | `nocap.rule` | Broad coverage |
 | `BETA.txt` | `nocap.rule` | Test new experimental roots |
 
@@ -206,14 +206,14 @@ hashcat -m 0 hashes.txt nocap.txt
 hashcat -m 0 hashes.txt nocap-plus.txt -r nocap.rule
 
 # Surgical attack
-hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
+hashcat -m 0 hashes.txt nocap-plus.txt -r unobtainium.rule
 ```
 
 ### Both Rules Combined
 
 ```bash
 # Run surgical first (fast), then broad
-hashcat -m 0 hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
+hashcat -m 0 hashes.txt nocap-plus.txt -r unobtainium.rule
 hashcat -m 0 hashes.txt nocap-plus.txt -r nocap.rule
 ```
 
@@ -291,7 +291,7 @@ hashcat -m <hash_type> hashes.txt -a 6 nocap-plus.txt ?s?d?d?d             # wor
 1. Brute-force 1-6 chars (instant)
 2. Digit masks 9-12 (instant)
 3. 8-char lowercase + lowercase+digit masks (~5 min)
-4. Dictionary + UNOBTAINIUM.rule (<1 sec)
+4. Dictionary + unobtainium.rule (<1 sec)
 5. Dictionary + nocap.rule (~1.5 min)
 6. Hybrid word + 4 digits + word + 3d1s (~8 sec + ~2 min)
 7. Brute-force 7 chars (~107 min)
@@ -313,15 +313,16 @@ Do not use these tools for unauthorized access to systems or accounts you do not
 
 ## Version
 
-**Current release:** v1.0 (February 2026)
+**Current release:** v2.0 (March 2026)
 
 Wordlists and rules are actively maintained. New roots and patterns are added as they are discovered and validated through the feedback pipeline.
 
 | Date | Change |
 |------|--------|
-| 2026-02-27 | UNOBTAINIUM.rule updated to 258 rules (year+special suffix patterns, batch-0023 feedback). nocap-plus.txt updated (+81 roots from feedback loop). Expanded complementary attacks section with measured hybrid ROI data and digit+special suffix attacks. Added hybrid speed note. |
-| 2026-02-25 | bussin.rule audit — stripped 65 spacing-variant duplicates, 14 truly unique rules remain. nocap.rule rebuilt with space-normalized dedup (48,428 rules, 0 duplicates). UNOBTAINIUM.rule expanded to 248 rules (keyboard suffixes, prepends, special combos) |
-| 2026-02 | Initial release — nocap.txt, nocap-plus.txt, nocap.rule, UNOBTAINIUM.rule |
+| 2026-03-25 | **v2.0:** Added thicc.txt + thicc.rule attack profile. Three-way benchmark on HIBP gravel: rockyou+OneRule 29.96%, nocap 30.00%, thicc 30.21% (+0.25pp = ~5.4M extra cracks across HIBP). unobtainium.rule finalized at 263 rules (removed 1 duplicate with nocap.rule, cleaned internal comments). Renamed unobtainium.rule to lowercase. rizzyou.txt updated to 223 words. |
+| 2026-02-27 | unobtainium.rule updated to 258 rules (year+special suffix patterns, batch-0023 feedback). nocap-plus.txt updated (+81 roots from feedback loop). Expanded complementary attacks section with measured hybrid ROI data and digit+special suffix attacks. Added hybrid speed note. |
+| 2026-02-25 | bussin.rule audit — stripped 65 spacing-variant duplicates, 14 truly unique rules remain. nocap.rule rebuilt with space-normalized dedup (48,452 rules, 0 duplicates). unobtainium.rule expanded to 248 rules (keyboard suffixes, prepends, special combos) |
+| 2026-02 | Initial release — nocap.txt, nocap-plus.txt, nocap.rule, unobtainium.rule |
 
 ## Acknowledgments
 

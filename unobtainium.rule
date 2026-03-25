@@ -7,7 +7,7 @@
 # USAGE: Pair with large wordlists for a fast, high-yield pass:
 #   hashcat -m <hash_type> hashes.txt nocap-plus.txt -r UNOBTAINIUM.rule
 #
-# Rules: 264 | Keyspace: 264 x 14.4M = 3.8B (~0.5s on RTX 4060 Ti)
+# Rules: 263 | Keyspace: 263 x 14.4M = 3.8B (~0.5s on RTX 4060 Ti)
 # https://github.com/doritoes/wordforge
 #
 # --- Special char prepends ---
@@ -242,7 +242,6 @@ $! $2 $0 $2 $5
 $@ $2 $0 $2 $4
 $# $2 $0 $2 $4
 $_ $2 $0 $2 $4
-$1 $2 $3 $4 $5
 # --- With capitalize (corporate: Cap+root+year+special) ---
 c $2 $0 $2 $4 $!
 c $2 $0 $2 $5 $!
