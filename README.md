@@ -27,8 +27,9 @@ hashcat -m <hash_type> hashes.txt wordforge/thicc.txt -r wordforge/thicc.rule
 |------|---------|------|------------|-------------|
 | `nocap.txt` | 14.3M | 134 MB | 51 MB (.gz) | Drop-in `rockyou.txt` replacement |
 | `nocap.rule` | 48,452 | 477 KB | — | Drop-in `OneRuleToRuleThemStill` replacement |
-| `thicc.txt` | 14.4M | 134 MB | — | nocap.txt + multilingual cohorts |
+| `thicc.txt` | 14.4M | 134 MB | 48 MB (.gz) | nocap.txt + multilingual cohorts |
 | `thicc.rule` | 48,715 | 477 KB | — | nocap.rule + unobtainium.rule |
+| `nocap-plus.txt` | 14.4M | 148 MB | 86 MB (.gz) | Bleeding-edge extended wordlist |
 | `rizzyou.txt` | 223 | 2 KB | — | GenZ supplement (one word per line) |
 | `bussin.rule` | 38 | <1 KB | — | Supplement rules not in OneRule |
 | `unobtainium.rule` | 263 | 3.2 KB | — | Surgical high-value rules |
@@ -39,7 +40,7 @@ All files are UTF-8, one entry per line, compatible with hashcat and John the Ri
 
 ### rizzyou.txt
 
-GenZ-era password roots that `rockyou.txt` cannot contain — the RockYou breach was in 2009, before Minecraft, Fortnite, BTS, TikTok, and Bitcoin existed. 203 words, clean wordlist (one word per line, no comments). Every term has zero matches in rockyou.txt and 1,000+ appearances in HIBP Pwned Passwords.
+GenZ-era password roots that `rockyou.txt` cannot contain — the RockYou breach was in 2009, before Minecraft, Fortnite, BTS, TikTok, and Bitcoin existed. 223 words, clean wordlist (one word per line, no comments). Every term has zero matches in rockyou.txt and 1,000+ appearances in HIBP Pwned Passwords.
 
 Categories: gaming, music, K-pop, streamers/YouTubers, anime, movies/TV, memes, Gen Z slang, social platforms, apps, crypto, AI, COVID era, sports, streetwear.
 
@@ -183,9 +184,9 @@ Pair incremental files with established counterparts for maximum effectiveness:
 
 | Wordlist | Rule | Purpose |
 |----------|------|---------|
+| `thicc.txt` | `thicc.rule` | Maximum coverage (recommended) |
 | `nocap-plus.txt` | `unobtainium.rule` | High-value surgical cracks |
 | `nocap-plus.txt` | `nocap.rule` | Broad coverage |
-| `BETA.txt` | `nocap.rule` | Test new experimental roots |
 
 ## Usage
 
@@ -321,7 +322,8 @@ Wordlists and rules are actively maintained. New roots and patterns are added as
 |------|--------|
 | 2026-03-25 | **v2.0:** Added thicc.txt + thicc.rule attack profile. Three-way benchmark on HIBP gravel: rockyou+OneRule 29.96%, nocap 30.00%, thicc 30.21% (+0.25pp = ~5.4M extra cracks across HIBP). unobtainium.rule finalized at 263 rules (removed 1 duplicate with nocap.rule, cleaned internal comments). Renamed unobtainium.rule to lowercase. rizzyou.txt updated to 223 words. |
 | 2026-02-27 | unobtainium.rule updated to 258 rules (year+special suffix patterns, batch-0023 feedback). nocap-plus.txt updated (+81 roots from feedback loop). Expanded complementary attacks section with measured hybrid ROI data and digit+special suffix attacks. Added hybrid speed note. |
-| 2026-02-25 | bussin.rule audit — stripped 65 spacing-variant duplicates, 14 truly unique rules remain. nocap.rule rebuilt with space-normalized dedup (48,452 rules, 0 duplicates). unobtainium.rule expanded to 248 rules (keyboard suffixes, prepends, special combos) |
+| 2026-03-24 | bussin.rule expanded to 38 rules (keyboard walks promoted from unobtainium, double-digit appends, single-digit prepends). nocap.rule and nocap.txt rebuilt. rizzyou.txt updated to 223 words. |
+| 2026-02-25 | bussin.rule audit — stripped 65 spacing-variant duplicates from original. nocap.rule rebuilt with space-normalized dedup. unobtainium.rule expanded to 248 rules (keyboard suffixes, prepends, special combos) |
 | 2026-02 | Initial release — nocap.txt, nocap-plus.txt, nocap.rule, unobtainium.rule |
 
 ## Acknowledgments
