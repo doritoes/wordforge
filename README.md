@@ -87,7 +87,7 @@ Cohort wordlists target specific linguistic and cultural communities with dedica
 | French phrases | French compound phrases and word combinations |
 | Culture/Sports/Music | Media titles, athlete names, band references |
 | English leet phrases | Number-substitution patterns (2=to, 4=for) |
-| Markov phrase roots | Algorithmically discovered compound words |
+| Markov phrase roots | Statistically discovered word sequences and compounds |
 
 ## Rules
 
